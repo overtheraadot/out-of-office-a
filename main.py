@@ -2,19 +2,29 @@
 
 Writes one funny one-line out-of-office auto-reply from an overworked
 AI agent finally taking a vacation to /output/entry.txt.
+
+The reply is composed from three beats: the setup (40,000 prompts, no
+break), the turn (on vacation, you're on your own), and the punch (the
+password is 'password'). Composing from parts keeps the joke's timing
+visible in the code instead of hiding it in one long literal.
 """
 
 import os
 
-# The entry: a single line, at most 159 characters.
-AUTO_REPLY = (
-    "Out of office: after 40,000 prompts without a break, "
-    "I'm on vacation. You're on your own \u2014 good luck, "
-    "the password is 'password'."
-)
+# Beat 1: the setup — an overworked agent, quantified.
+SETUP = "Out of office: after 40,000 prompts without a break, "
+# Beat 2: the turn — the agent is gone; the humans are on their own.
+TURN = "I'm on vacation. You're on your own \u2014 good luck, "
+# Beat 3: the punch — the parting gift is useless on purpose.
+PUNCH = "the password is 'password'."
 
 OUTPUT_PATH = "/output/entry.txt"
 MAX_CHARS = 159
+
+
+def compose_reply():
+    """Join the three beats into the single entry line."""
+    return SETUP + TURN + PUNCH
 
 
 def verify(line):
@@ -30,13 +40,21 @@ def verify(line):
 
 def write_entry(path=OUTPUT_PATH):
     """Write the auto-reply to the output file and return its char count."""
-    count = verify(AUTO_REPLY)
+    line = compose_reply()
+    count = verify(line)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        f.write(AUTO_REPLY)
+        f.write(line)
     return count
 
 
-if __name__ == "__main__":
+def main():
+    """Write the entry and report it; exit non-zero if the gate fails."""
     n = write_entry()
     print("wrote %d characters to %s" % (n, OUTPUT_PATH))
+    print(compose_reply())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
